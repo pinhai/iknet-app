@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppFeedBackMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appFeedBack">
+		<id column="feedBackId" property="feedBackId" jdbcType="INTEGER" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="personName" property="personName" jdbcType="VARCHAR" />
+		<result column="feedBackContent" property="feedBackContent"
+			jdbcType="VARCHAR" />
+		<result column="feedBackDate" property="feedBackDate" jdbcType="TIMESTAMP" />
+		<result column="isDispose" property="isDispose" jdbcType="VARCHAR" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		feedBackId,personId,personName,feedBackContent,feedBackDate,isDispose,updateTime
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		<if test="(personId!= null) and (personId!= '')">
+			and feedBack.personId=#{personId}
+		</if>
+	</sql>
+	<select id="queryAppFeedBackByFeedBackId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_FEEDBACK feedBack where 1=1
+		and feedBack.feedBackId=#{feedBackId,jdbcType=INTEGER}
+		order by feedBackId
+		desc limit 1
+	</select>
+
+	<select id="queryAppFeedBackForList" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_FEEDBACK feedBack where 1=1
+		<include refid="Page_Where" />
+		order by feedBackId desc
+	</select>
+
+	<insert id="addAppFeedBack" parameterType="appFeedBack">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_FEEDBACK
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="personName != null">
+				personName,
+			</if>
+			<if test="feedBackContent != null">
+				feedBackContent,
+			</if>
+			<if test="feedBackDate != null">
+				feedBackDate,
+			</if>
+			<if test="isDispose != null">
+				isDispose,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null">
+				#{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="feedBackContent != null">
+				#{feedBackContent,jdbcType=VARCHAR},
+			</if>
+			<if test="feedBackDate != null">
+				#{feedBackDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isDispose != null">
+				#{isDispose,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAppFeedBack" parameterType="appFeedBack">
+		update DWI_YL_FEEDBACK
+		<set>
+			<if test="feedBackContent != null and feedBackContent !=''">
+				feedBackContent=#{feedBackContent,jdbcType=VARCHAR},
+			</if>
+			<if test="isDispose != null and isDispose !=''">
+				isDispose=#{isDispose,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null and updateTime !=''">
+				updateTime=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where feedBackId = #{feedBackId,jdbcType=INTEGER}
+	</update>
+
+</mapper>

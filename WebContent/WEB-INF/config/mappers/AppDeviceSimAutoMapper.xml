@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppDeviceSimAutoMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appDeviceSimAuto">
+		<id column="deviceSim" property="deviceSim" jdbcType="VARCHAR" />
+		<result column="startHours" property="startHours" jdbcType="INTEGER" />
+		<result column="startMinutes" property="startMinutes" jdbcType="INTEGER" />
+		<result column="endHours" property="endHours" jdbcType="INTEGER" />
+		<result column="endMinutes" property="endMinutes" jdbcType="INTEGER" />
+		<result column="intervalTime" property="intervalTime" jdbcType="INTEGER" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="useFlag" property="useFlag" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		deviceSim,startHours,startMinutes,endHours,endMinutes,intervalTime,useFlag
+	</sql>
+
+	<select id="queryAppDeviceSimAuto" resultMap="BaseResultMap"
+		parameterType="appDeviceSimAuto">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_DEVICESIM_AUTO deviceSimAuto where 1=1 and
+		deviceSimAuto.deviceSim=#{deviceSim,jdbcType=VARCHAR}
+	</select>
+
+	<insert id="addAppDeviceSimAuto" parameterType="appDeviceSimAuto">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_DEVICESIM_AUTO
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceSim != null">
+				deviceSim,
+			</if>
+			<if test="startHours != null">
+				startHours,
+			</if>
+			<if test="startMinutes != null">
+				startMinutes,
+			</if>
+			<if test="endHours != null">
+				endHours,
+			</if>
+			<if test="endMinutes != null">
+				endMinutes,
+			</if>
+			<if test="intervalTime != null">
+				intervalTime,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="useFlag != null">
+				useFlag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="deviceSim != null">
+				#{deviceSim,jdbcType=VARCHAR},
+			</if>
+			<if test="startHours != null">
+				#{startHours,jdbcType=INTEGER},
+			</if>
+			<if test="startMinutes != null">
+				#{startMinutes,jdbcType=INTEGER},
+			</if>
+			<if test="endHours != null">
+				#{endHours,jdbcType=INTEGER},
+			</if>
+			<if test="endMinutes != null">
+				#{endMinutes,jdbcType=INTEGER},
+			</if>
+			<if test="intervalTime != null">
+				#{intervalTime,jdbcType=INTEGER},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="useFlag != null">
+				#{useFlag,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+
+
+	<update id="updateAppDeviceSimAuto" parameterType="appDeviceSimAuto">
+		update DWI_YL_DEVICESIM_AUTO
+		<set>
+			<if test="startHours != null and startHours != ''">
+				startHours=#{startHours,jdbcType=INTEGER},
+			</if>
+			<if test="startMinutes != null and startMinutes != ''">
+				startMinutes=#{startMinutes,jdbcType=INTEGER},
+			</if>
+			<if test="endHours != null and endHours != ''">
+				endHours=#{endHours,jdbcType=INTEGER},
+			</if>
+			<if test="endMinutes != null and endMinutes != ''">
+				endMinutes=#{endMinutes,jdbcType=INTEGER},
+			</if>
+			<if test="intervalTime != null and intervalTime != ''">
+				intervalTime=#{intervalTime,jdbcType=INTEGER},
+			</if>
+
+			<if test="updateTime != null and updateTime !=''">
+				updateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+
+			<if test="useFlag != null and useFlag != ''">
+				useFlag=#{useFlag,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where deviceSim = #{deviceSim,jdbcType=VARCHAR}
+	</update>
+
+</mapper>

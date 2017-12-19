@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppReviceDataMapper">
+	<cache />
+
+	<resultMap id="BaseResultMap" type="appReviceData">
+		<id column="deviceSim" property="deviceSim" jdbcType="VARCHAR" />
+		<result column="highPressure" property="highPressure" jdbcType="VARCHAR" />
+		<result column="lowVoltage" property="lowVoltage" jdbcType="VARCHAR" />
+		<result column="pulse" property="pulse" jdbcType="VARCHAR" />
+		<result column="uploadDate" property="uploadDate" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="idCard" property="idCard" jdbcType="VARCHAR" />
+		<result column="expireTime" property="expireTime" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<resultMap id="BaseResultMap_appThreeHeightRecord" type="appThreeHeightRecord">
+		<result column="threeHeightType" property="threeHeightType"
+			jdbcType="VARCHAR" />
+		<result column="threeHeightTimeLength" property="threeHeightTimeLength"
+			jdbcType="NUMERIC" />
+		<result column="uploadDate" property="uploadDate" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="VARCHAR" />
+
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		personDevice.deviceSim,personDevice.personId,highPressure,lowVoltage,pulse,uploadDate,createTime,idCard
+	</sql>
+
+	<sql id="Base_Column_List_appThreeHeightRecord">
+		highPressure as threeHeightTimeLength,lowVoltage as
+		threeHeightType,pulse as
+		threeHeightUploadDate,uploadDate,date_format(createTime,'%Y-%m-%d
+		%H:%i:%s') as createTime
+	</sql>
+
+
+
+	<sql id="Base_Column_List_ForIDCard">
+		highPressure,lowVoltage,pulse,uploadDate,createTime,idCard
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Map_Where">
+		and
+		personDevice.personId=#{vo.personId,jdbcType=VARCHAR}
+	</sql>
+
+	<select id="queryAppReviceDataForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_REVICEDATA reviceData,DWI_YL_PERSON_DEVICE personDevice
+		where 1=1 and reviceData.deviceSim=personDevice.deviceSim
+		<include refid="Map_Where" />
+		<choose>
+			<otherwise>
+				order by uploadDate desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryAppReviceDataForIDCardForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List_ForIDCard" />
+		from DWI_YL_REVICEDATA reviceData
+		where 1=1 and
+		reviceData.idCard=#{vo.idCard,jdbcType=VARCHAR}
+		<choose>
+			<otherwise>
+				order by uploadDate desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryAppPersonDeviceByMap" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		personDevice.deviceSim,personDevice.personId,personDevice.deviceFlag,
+		datediff(o.expireTime,curdate()) as expireTime
+		from
+		DWI_YL_PERSON_DEVICE personDevice left join dwi_yl_outdev o on
+		left(personDevice.deviceSim, 14)=trim(o.devNo) where 1=1
+		and
+		personDevice.personId=#{vo.personId,jdbcType=VARCHAR}
+
+		order
+		by
+		personId desc
+	</select>
+
+	<select id="queryAppPersonDeviceCount" resultType="java.lang.Integer"
+		parameterType="appReviceData">
+		select count(1) as s
+		from
+		DWI_YL_PERSON_DEVICE personDevice left join
+		dwi_yl_outdev o on
+		left(personDevice.deviceSim, 14)=trim(o.devNo) where
+		1=1
+		<!-- <if test="(personId!= null) and (personId!= '')"> and personDevice.personId=#{personId} 
+			</if> -->
+		<if test="(deviceSim!= null) and (deviceSim!= '')">
+			and personDevice.deviceSim=#{deviceSim}
+		</if>
+		<if test="(idCard !=null) and (idCard!= '')">
+			and personDevice.idCard=#{idCard}
+		</if>
+		<if test="(deviceFlag !=null) and (deviceFlag!= '')">
+			and personDevice.deviceFlag=#{deviceFlag}
+		</if>
+	</select>
+
+	<delete id="deleteAppPersonDeviceByMap" parameterType="map">
+		delete
+		from
+		DWI_YL_PERSON_DEVICE where
+		personId=#{vo.personId,jdbcType=VARCHAR} and
+		deviceSim=#{vo.deviceSim,jdbcType=VARCHAR}
+	</delete>
+
+	<insert id="addAppPersonDevice" parameterType="appReviceData">
+		insert into DWI_YL_PERSON_DEVICE
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceSim != null">
+				deviceSim,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="deviceFlag != null">
+				deviceFlag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="deviceSim != null">
+				#{deviceSim,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="deviceFlag != null">
+				#{deviceFlag,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+
+	<select id="queryAppThreeHeightRecordList" resultMap="BaseResultMap_appThreeHeightRecord"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List_appThreeHeightRecord" />
+		from DWI_YL_REVICEDATA reviceData
+		where 1=1 and
+		trim(reviceData.deviceSim)=#{vo.deviceSim,jdbcType=VARCHAR}
+		<if test="(vo.uploadDate!= null) and (vo.uploadDate!= '')">
+			and
+			trim(reviceData.uploadDate)=#{vo.uploadDate,jdbcType=VARCHAR}
+		</if>
+		<choose>
+			<otherwise>
+				order by uploadDate desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="queryYlPersonDeviceForPersonIdList" resultMap="BaseResultMap"
+		parameterType="map">
+		select distinct
+		personId
+		from
+		DWI_YL_PERSON_DEVICE personDevice where
+		1=1
+		<if test="(deviceSim!= null) and (deviceSim!= '')">
+			and trim(personDevice.deviceSim)=#{deviceSim}
+		</if>
+		<if test="(deviceFlag !=null) and (deviceFlag!= '')">
+			and trim(personDevice.deviceFlag)=#{deviceFlag}
+		</if>
+		order by personId desc
+	</select>
+</mapper>

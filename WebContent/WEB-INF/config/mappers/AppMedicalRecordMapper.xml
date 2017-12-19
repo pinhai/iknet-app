@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppMedicalRecordMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appMedicalRecord">
+		<id column="medicalRecordId" property="medicalRecordId" jdbcType="VARCHAR" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="personName" property="personName" jdbcType="VARCHAR" />
+		<result column="checkDiastole" property="checkDiastole"
+			jdbcType="INTEGER" />
+		<result column="checkShrink" property="checkShrink" jdbcType="INTEGER" />
+		<result column="checkHeartRate" property="checkHeartRate"
+			jdbcType="INTEGER" />
+		<result column="uploadDate" property="uploadDate" jdbcType="VARCHAR" />
+		<result column="equipType" property="equipType" jdbcType="VARCHAR" />
+		<result column="checkResult" property="checkResult" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="medicalRecordNo" property="medicalRecordNo"
+			jdbcType="VARCHAR" />
+		<result column="medicalRecordRemark" property="medicalRecordRemark"
+			jdbcType="VARCHAR" />
+
+		<result column="threeAutoFlag" property="threeAutoFlag"
+			jdbcType="VARCHAR" />
+		<result column="checkHeartResult" property="checkHeartResult"
+			jdbcType="VARCHAR" />
+		<result column="checkHeartBeat" property="checkHeartBeat"
+			jdbcType="VARCHAR" />
+		<result column="checkBloodResult" property="checkBloodResult"
+			jdbcType="VARCHAR" />
+		<result column="checkAutoFrom" property="checkAutoFrom"
+			jdbcType="VARCHAR" />
+		<result column="checkAutoFlag" property="checkAutoFlag"
+			jdbcType="VARCHAR" />
+		<result column="bluetoothName" property="bluetoothName"
+			jdbcType="VARCHAR" />
+		<result column="aOrB" property="aOrB" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		medicalRecordId,medicalRecord.personId,checkDiastole,checkShrink,checkHeartRate,uploadDate,checkResult,createTime,updateTime,medicalRecordNo,medicalRecordRemark,aOrB,medicalRecord.bluetoothName
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		and mergeAccount.personId=#{vo.personId,jdbcType=VARCHAR}
+	</sql>
+
+
+	<sql id="Map_Where">
+		and mergeAccount.personId=#{personId,jdbcType=VARCHAR}
+		<!-- and medicalRecord.uploadDate>=TO_TIMESTAMP_TZ(#{startTime}, 'yyyy-mm-dd 
+			hh24:mi:ss') -->
+		<if test="(startTime!= null) and (startTime!= '')">
+			and
+			medicalRecord.uploadDate>=#{startTime}
+		</if>
+
+		<if test="(endTime!= null) and (endTime!= '')">
+			and medicalRecord.uploadDate &lt;=
+			#{endTime}
+		</if>
+
+		<if test="(equalsTime!= null) and (equalsTime!= '')">
+			and
+			medicalRecord.uploadDate>=#{equalsTime}
+		</if>
+
+		<if test="(equalsTime!= null) and (equalsTime!= '')">
+			and medicalRecord.uploadDate &lt;=
+			#{equalsTime}
+		</if>
+	</sql>
+
+	<select id="queryAppMedicalRecordByMapForDefault" resultMap="BaseResultMap"
+		parameterType="map">
+		select * from(
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MEDICAL_RECORD medicalRecord,DWI_YL_MERGEACCOUNT
+		mergeAccount where 1=1 and
+		medicalRecord.personId=mergeAccount.accountPersonId
+		<include refid="Map_Where" />
+		group by medicalRecord.uploadDate,medicalRecord.personId order by
+		medicalRecord.uploadDate
+		desc,medicalRecord.medicalRecordId asc
+		limit
+		#{endRowNum}) B order by
+		uploadDate asc
+	</select>
+
+	<select id="queryAppMedicalRecordByMapForEveryDay" resultMap="BaseResultMap"
+		parameterType="map">
+		select * from(
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MEDICAL_RECORD medicalRecord,DWI_YL_MERGEACCOUNT
+		mergeAccount where 1=1 and
+		medicalRecord.personId=mergeAccount.accountPersonId
+		<include refid="Map_Where" />
+		group by medicalRecord.uploadDate,medicalRecord.personId order by
+		medicalRecord.uploadDate
+		desc,medicalRecord.medicalRecordId asc) B
+		order by
+		uploadDate asc
+	</select>
+
+	<select id="queryAppMedicalRecordByMapForOneDay" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MEDICAL_RECORD medicalRecord,DWI_YL_MERGEACCOUNT
+		mergeAccount where 1=1 and
+		medicalRecord.personId=mergeAccount.accountPersonId
+		<include refid="Map_Where" />
+		order by medicalRecord.uploadDate
+		desc,medicalRecord.medicalRecordId
+		asc,mergeAccount.personId desc
+	</select>
+
+
+	<select id="queryAppMedicalRecordListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MEDICAL_RECORD medicalRecord,DWI_YL_MERGEACCOUNT
+		mergeAccount where 1=1 and
+		medicalRecord.personId=mergeAccount.accountPersonId
+		<include refid="Page_Where" />
+		<choose>
+			<otherwise>
+				order by medicalRecord.uploadDate
+				desc,medicalRecord.medicalRecordId desc,mergeAccount.personId desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryAppMedicalRecordForLastOneByPersonId"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MEDICAL_RECORD medicalRecord,DWI_YL_MERGEACCOUNT
+		mergeAccount where 1=1 and
+		medicalRecord.personId=mergeAccount.accountPersonId
+		and
+		mergeAccount.personId=#{personId,jdbcType=VARCHAR}
+		order by
+		medicalRecord.uploadDate
+		desc,medicalRecord.medicalRecordId
+		desc,mergeAccount.personId desc limit 1
+	</select>
+
+	<insert id="addAppMedicalRecord" parameterType="appMedicalRecord">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+		<!-- <selectKey resultType="long" keyProperty="medicalRecordId" order="BEFORE"> 
+			select SEQ_DWI_YL_MEDICAL_RECORD.NEXTVAL from dual </selectKey> -->
+		insert into DWI_YL_MEDICAL_RECORD
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="medicalRecordId != null">
+				medicalRecordId,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="personName != null">
+				personName,
+			</if>
+			<if test="checkDiastole != null">
+				checkDiastole,
+			</if>
+			<if test="checkShrink != null">
+				checkShrink,
+			</if>
+			<if test="checkHeartRate != null">
+				checkHeartRate,
+			</if>
+			<if test="uploadDate != null">
+				uploadDate,
+			</if>
+			<if test="equipType != null">
+				equipType,
+			</if>
+			<if test="checkResult != null">
+				checkResult,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+			<if test="medicalRecordNo != null">
+				medicalRecordNo,
+			</if>
+			<if test="medicalRecordRemark != null">
+				medicalRecordRemark,
+			</if>
+			<if test="threeAutoFlag != null">
+				threeAutoFlag,
+			</if>
+			<if test="checkHeartResult != null">
+				checkHeartResult,
+			</if>
+			<if test="checkHeartBeat != null">
+				checkHeartBeat,
+			</if>
+			<if test="checkBloodResult != null">
+				checkBloodResult,
+			</if>
+			<if test="checkAutoFrom != null">
+				checkAutoFrom,
+			</if>
+			<if test="checkAutoFlag != null">
+				checkAutoFlag,
+			</if>
+			<if test="bluetoothName != null">
+				bluetoothName,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="medicalRecordId != null">
+				#{medicalRecordId,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null">
+				#{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="checkDiastole != null">
+				#{checkDiastole,jdbcType=INTEGER},
+			</if>
+			<if test="checkShrink != null">
+				#{checkShrink,jdbcType=INTEGER},
+			</if>
+			<if test="checkHeartRate != null">
+				#{checkHeartRate,jdbcType=INTEGER},
+			</if>
+			<if test="uploadDate != null">
+				#{uploadDate,jdbcType=VARCHAR},
+			</if>
+			<if test="equipType != null">
+				#{equipType,jdbcType=VARCHAR},
+			</if>
+			<if test="checkResult != null">
+				#{checkResult,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="medicalRecordNo != null">
+				#{medicalRecordNo,jdbcType=VARCHAR},
+			</if>
+			<if test="medicalRecordRemark != null">
+				#{medicalRecordRemark,jdbcType=VARCHAR},
+			</if>
+			<if test="threeAutoFlag != null">
+				#{threeAutoFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="checkHeartResult != null">
+				#{checkHeartResult,jdbcType=VARCHAR},
+			</if>
+			<if test="checkHeartBeat != null">
+				#{checkHeartBeat,jdbcType=VARCHAR},
+			</if>
+			<if test="checkBloodResult != null">
+				#{checkBloodResult,jdbcType=VARCHAR},
+			</if>
+			<if test="checkAutoFrom != null">
+				#{checkAutoFrom,jdbcType=VARCHAR},
+			</if>
+			<if test="checkAutoFlag != null">
+				#{checkAutoFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="bluetoothName != null">
+				#{bluetoothName,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<insert id="addBatchAppMedicalRecordByAppJsonList"
+		parameterType="java.util.List">
+		insert into
+		DWI_YL_MEDICAL_RECORD(medicalRecordId,personId,personName,checkDiastole,checkShrink,checkHeartRate,uploadDate,equipType,checkResult,createTime,updateTime,medicalRecordNo,medicalRecordRemark,threeAutoFlag,checkHeartResult,checkHeartBeat,checkBloodResult,checkAutoFrom,checkAutoFlag,bluetoothName)
+		values
+		<foreach collection="list" item="vo" index="index" separator=",">
+			(
+			#{vo.medicalRecordId,jdbcType=VARCHAR},#{vo.personId,jdbcType=VARCHAR},
+			#{vo.personName,jdbcType=VARCHAR},#{vo.checkDiastole,jdbcType=INTEGER},
+			#{vo.checkShrink,jdbcType=INTEGER},#{vo.checkHeartRate,jdbcType=INTEGER},#{vo.uploadDate,jdbcType=VARCHAR},
+			#{vo.equipType,jdbcType=VARCHAR}, #{vo.checkResult,jdbcType=VARCHAR},
+			#{vo.createTime,jdbcType=TIMESTAMP},#{vo.updateTime,jdbcType=TIMESTAMP},
+			#{vo.medicalRecordNo,jdbcType=VARCHAR},
+			#{vo.medicalRecordRemark,jdbcType=VARCHAR},
+			#{vo.threeAutoFlag,jdbcType=VARCHAR},
+			#{vo.checkHeartResult,jdbcType=VARCHAR},
+			#{vo.checkHeartBeat,jdbcType=VARCHAR},
+			#{vo.checkBloodResult,jdbcType=VARCHAR},
+			#{vo.checkAutoFrom,jdbcType=VARCHAR},
+			#{vo.checkAutoFlag,jdbcType=VARCHAR},
+			#{vo.bluetoothName,jdbcType=VARCHAR}
+			)
+		</foreach>
+	</insert>
+
+
+	<delete id="deleteAppMedicalRecord" parameterType="appMedicalRecord">
+		delete from
+		DWI_YL_MEDICAL_RECORD where
+		medicalRecordId=#{medicalRecordId,jdbcType=VARCHAR}
+	</delete>
+</mapper>

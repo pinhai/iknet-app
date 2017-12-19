@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppUserThreeMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appUserThreeInfo">
+		<id column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="accessToken" property="accessToken" jdbcType="VARCHAR" />
+		<result column="refreshToken" property="refreshToken" jdbcType="VARCHAR" />
+		<result column="loginSource" property="loginSource" jdbcType="VARCHAR" />
+		<result column="loginReturnId" property="loginReturnId"
+			jdbcType="VARCHAR" />
+		<result column="lastAccessDate" property="lastAccessDate"
+			jdbcType="DATE" />
+	</resultMap>
+
+	<insert id="addAppUserThree" parameterType="appUserThreeInfo">
+		insert into DWI_MD_PERSON_THREEINFO
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="accessToken != null">
+				accessToken,
+			</if>
+			<if test="refreshToken != null">
+				refreshToken,
+			</if>
+			<if test="loginSource != null">
+				loginSource,
+			</if>
+			<if test="loginReturnId != null">
+				loginReturnId,
+			</if>
+			<if test="lastAccessDate != null">
+				lastAccessDate,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="accessToken != null">
+				#{accessToken,jdbcType=VARCHAR},
+			</if>
+			<if test="refreshToken != null">
+				#{refreshToken,jdbcType=VARCHAR},
+			</if>
+			<if test="loginSource != null">
+				#{loginSource,jdbcType=VARCHAR},
+			</if>
+			<if test="loginReturnId != null">
+				#{loginReturnId,jdbcType=VARCHAR},
+			</if>
+			<if test="lastAccessDate != null">
+				#{lastAccessDate,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAppUserThree" parameterType="map">
+		update DWI_MD_PERSON_THREEINFO
+		<set>
+			<if test="accessToken != null and accessToken !=''">
+				accessToken=#{accessToken,jdbcType=VARCHAR},
+			</if>
+			<if test="accessToken != null and accessToken !=''">
+				refreshToken = #{accessToken,jdbcType=VARCHAR},
+			</if>
+			<if test="lastAccessDate != null and lastAccessDate != ''">
+				lastAccessDate = #{lastAccessDate,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where personId = #{personId,jdbcType=VARCHAR}
+	</update>
+
+</mapper>

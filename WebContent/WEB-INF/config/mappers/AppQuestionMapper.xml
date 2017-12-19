@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppQuestionMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appQuestion">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="questionContent" property="questionContent"
+			jdbcType="VARCHAR" />
+		<result column="typeId" property="typeId" jdbcType="INTEGER" />
+		<result column="answerTotal" property="answerTotal" jdbcType="INTEGER" />
+		<result column="isShow" property="isShow" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="doctorAnswerFlag" property="doctorAnswerFlag"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,questionContent,typeId,answerTotal,isShow,createTime,doctorAnswerFlag,personId,(select
+		person.personname from DWI_MD_PERSON person where 1=1 and
+		question.personId=person.personid limit 1) as userName
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		and question.typeId=#{vo.typeId,jdbcType=INTEGER}
+		and
+		question.isShow=#{vo.isShow,jdbcType=VARCHAR}
+	</sql>
+
+	<sql id="MyPage_Where">
+		and
+		question.personId=#{vo.personId,jdbcType=VARCHAR}
+
+		<if test="(vo.isShow!= null) and (vo.isShow!= '')">
+			and
+			question.isShow=#{vo.isShow,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<select id="queryAppQuestionListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_QUESTION question where 1=1
+		<include refid="Page_Where" />
+		<choose>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryMyAppQuestionListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_QUESTION question where 1=1
+		<include refid="MyPage_Where" />
+		<choose>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryAppQuestionById" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_QUESTION question where 1=1
+		and
+		question.id=#{id,jdbcType=VARCHAR}
+		order by id
+		desc limit 1
+	</select>
+
+	<insert id="addAppQuestion" parameterType="appQuestion">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_QUESTION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="typeId != null">
+				typeId,
+			</if>
+			<if test="questionContent != null">
+				questionContent,
+			</if>
+			<if test="answerTotal != null">
+				answerTotal,
+			</if>
+			<if test="isShow != null">
+				isShow,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="doctorAnswerFlag != null">
+				doctorAnswerFlag,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="typeId != null">
+				#{typeId,jdbcType=NUMERIC},
+			</if>
+			<if test="questionContent != null">
+				#{questionContent,jdbcType=VARCHAR},
+			</if>
+			<if test="answerTotal != null">
+				#{answerTotal,jdbcType=NUMERIC},
+			</if>
+			<if test="isShow != null">
+				#{isShow,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="doctorAnswerFlag != null">
+				#{doctorAnswerFlag,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAnswerTotal">
+		update DWI_YL_QUESTION
+		<set>
+			answerTotal=answerTotal+1,
+		</set>
+		where id = #{questionId,jdbcType=VARCHAR}
+	</update>
+
+</mapper>

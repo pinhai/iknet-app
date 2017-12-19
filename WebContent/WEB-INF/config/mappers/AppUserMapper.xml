@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppUserMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appUser">
+		<id column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="loginNo" property="loginNo" jdbcType="VARCHAR" />
+		<result column="mobilePhone" property="mobilePhone" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="loginPwd" property="loginPwd" jdbcType="VARCHAR" />
+		<result column="personName" property="personName" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="age" property="age" jdbcType="NUMERIC" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+
+		<result column="isMarry" property="isMarry" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="medicalHistory" property="medicalHistory"
+			jdbcType="VARCHAR" />
+		<result column="registerSource" property="registerSource"
+			jdbcType="VARCHAR" />
+		<result column="validFlag" property="validFlag" jdbcType="VARCHAR" />
+		<result column="height" property="height" jdbcType="DOUBLE" />
+
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="imageUrl" property="imageUrl" jdbcType="VARCHAR" />
+		<result column="allergySymptoms" property="allergySymptoms"
+			jdbcType="VARCHAR" />
+		<result column="drugHistory" property="drugHistory" jdbcType="VARCHAR" />
+		<result column="dateBirth" property="dateBirth" jdbcType="VARCHAR" />
+		<result column="weight" property="weight" jdbcType="DOUBLE" />
+
+		<result column="loginSource" property="loginSource" jdbcType="VARCHAR" />
+		<result column="loginReturnId" property="loginReturnId"
+			jdbcType="VARCHAR" />
+		<result column="userFromFlag" property="userFromFlag" jdbcType="VARCHAR" />
+		<result column="communityCode" property="communityCode"
+			jdbcType="VARCHAR" />
+		<result column="region" property="region" jdbcType="VARCHAR" />
+		<result column="contactMobile" property="contactMobile"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<resultMap id="appIknetEasemobUser_BaseResultMap" type="appIknetEasemobUser">
+		<id column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="personName" property="nickName" jdbcType="VARCHAR" />
+		<result column="imageUrl" property="imageUrl" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="appIknetEasemobUser_Base_Column_List">
+		personId,personName as nickName,imageUrl
+	</sql>
+
+	<sql id="Base_Column_List">
+		personId,loginNo,mobilePhone,email,loginPwd,personName,sex,age,province,city,address,isMarry,phone,medicalHistory,registerSource,validFlag,height,createTime,updateTime,imageUrl,allergySymptoms,drugHistory,dateBirth,weight,region,contactMobile,communityCode,(select
+		sysCommunity.sysCommunityName from DWI_SYS_COMMUNITY sysCommunity
+		where 1=1
+		and
+		sysCommunity.Syscommunitycode=person.communitycode
+		limit 1)
+		communityCodeName
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+	<select id="queryAppUserByPersonId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_MD_PERSON person where 1=1
+		and personId =
+		#{personId,jdbcType=VARCHAR} limit 1
+	</select>
+
+	<select id="queryAppUserByLoginNoMobilePhoneEmailLoginReturnId"
+		parameterType="map" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_MD_PERSON person where 1=1
+		<if test="loginNo != null">
+			and person.loginNo=#{loginNo,jdbcType=VARCHAR}
+		</if>
+		<if test="mobilePhone != null">
+			and
+			person.mobilePhone=#{mobilePhone,jdbcType=VARCHAR}
+		</if>
+		<if test="email != null">
+			and person.email=#{email,jdbcType=VARCHAR}
+		</if>
+		<if test="loginSource != null">
+			and
+			person.loginSource=#{loginSource,jdbcType=VARCHAR}
+		</if>
+		<if test="loginReturnId != null">
+			and
+			person.loginReturnId=#{loginReturnId,jdbcType=VARCHAR}
+		</if>
+		limit 1
+	</select>
+
+
+	<select id="queryAppIknetEasemobUserByMap" parameterType="map"
+		resultMap="appIknetEasemobUser_BaseResultMap">
+		select
+		<include refid="appIknetEasemobUser_Base_Column_List" />
+		from DWI_MD_PERSON person where 1=1 and personId in
+		<foreach collection="arr" item="personId" index="index" open="("
+			close=")" separator=",">
+			#{personId,jdbcType=VARCHAR}
+		</foreach>
+		order by personName asc
+	</select>
+
+
+	<insert id="addAppUser" parameterType="appUser">
+		<!-- <insert id="addAppUser" parameterType="appUser" useGeneratedKeys="true" 
+			keyProperty="personId"> -->
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_MD_PERSON
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="mobilePhone != null">
+				mobilePhone,
+			</if>
+			<if test="email != null">
+				email,
+			</if>
+			<if test="loginNo != null">
+				loginNo,
+			</if>
+			<if test="loginPwd != null">
+				loginPwd,
+			</if>
+
+			<if test="personName != null">
+				personName,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="age != null">
+				age,
+			</if>
+			<if test="province != null">
+				province,
+			</if>
+			<if test="city != null">
+				city,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="isMarry != null">
+				isMarry,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="medicalHistory != null">
+				medicalHistory,
+			</if>
+			<if test="registerSource != null">
+				registerSource,
+			</if>
+			<if test="validFlag != null">
+				validFlag,
+			</if>
+			<if test="height != null">
+				height,
+			</if>
+
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+			<if test="imageUrl != null">
+				imageUrl,
+			</if>
+			<if test="allergySymptoms != null">
+				allergySymptoms,
+			</if>
+			<if test="drugHistory != null">
+				drugHistory,
+			</if>
+			<if test="dateBirth != null">
+				dateBirth,
+			</if>
+			<if test="weight != null">
+				weight,
+			</if>
+			<if test="loginSource != null">
+				loginSource,
+			</if>
+			<if test="loginReturnId != null">
+				loginReturnId,
+			</if>
+			<if test="userFromFlag != null">
+				userFromFlag,
+			</if>
+			<if test="communityCode != null">
+				communityCode,
+			</if>
+			<if test="region != null">
+				region,
+			</if>
+			<if test="contactMobile != null">
+				contactMobile,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="mobilePhone != null">
+				#{mobilePhone,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null">
+				#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="loginNo != null">
+				#{loginNo,jdbcType=VARCHAR},
+			</if>
+			<if test="loginPwd != null">
+				#{loginPwd,jdbcType=VARCHAR},
+			</if>
+
+			<if test="personName != null">
+				#{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null">
+				#{age,jdbcType=NUMERIC},
+			</if>
+			<if test="province != null">
+				#{province,jdbcType=VARCHAR},
+			</if>
+			<if test="city != null">
+				#{city,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="isMarry != null">
+				#{isMarry,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="medicalHistory != null">
+				#{medicalHistory,jdbcType=VARCHAR},
+			</if>
+			<if test="registerSource != null">
+				#{registerSource,jdbcType=VARCHAR},
+			</if>
+			<if test="validFlag != null">
+				#{validFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="height != null">
+				#{height,jdbcType=DOUBLE},
+			</if>
+
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="imageUrl != null">
+				#{imageUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="allergySymptoms != null">
+				#{allergySymptoms,jdbcType=VARCHAR},
+			</if>
+			<if test="drugHistory != null">
+				#{drugHistory,jdbcType=VARCHAR},
+			</if>
+			<if test="dateBirth != null">
+				#{dateBirth,jdbcType=VARCHAR},
+			</if>
+			<if test="weight != null">
+				#{weight,jdbcType=DOUBLE},
+			</if>
+			<if test="loginSource != null">
+				#{loginSource,jdbcType=VARCHAR},
+			</if>
+			<if test="loginReturnId != null">
+				#{loginReturnId,jdbcType=VARCHAR},
+			</if>
+			<if test="userFromFlag != null">
+				#{userFromFlag,jdbcType=VARCHAR},
+			</if>
+
+			<if test="communityCode != null">
+				#{communityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="region != null">
+				#{region,jdbcType=VARCHAR},
+			</if>
+			<if test="contactMobile != null">
+				#{contactMobile,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<update id="updateAppUser" parameterType="map">
+		update DWI_MD_PERSON
+		<set>
+			<if test="vo.imageUrl != null and vo.imageUrl !=''">
+				imageUrl=#{vo.imageUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.personName != null and vo.personName !=''">
+				personName = #{vo.personName,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.sex != null and vo.sex != ''">
+				sex = #{vo.sex,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.age != null and vo.age !=''">
+				age = #{vo.age,jdbcType=NUMERIC},
+			</if>
+			<if test="vo.province != null and vo.province !=''">
+				province = #{vo.province,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.city != null and vo.city != ''">
+				city = #{vo.city,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.address != null and vo.address != ''">
+				address = #{vo.address,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.isMarry != null and vo.isMarry !=''">
+				isMarry = #{vo.isMarry,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.phone != null and vo.phone !=''">
+				phone = #{vo.phone,jdbcType=VARCHAR},
+			</if>
+
+			<if test="vo.updateTime != null and vo.updateTime !=''">
+				updateTime = #{vo.updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="vo.medicalHistory != null and vo.medicalHistory !=''">
+				medicalHistory =
+				#{vo.medicalHistory,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.height != null and vo.height !=''">
+				height = #{vo.height,jdbcType=DOUBLE},
+			</if>
+			<if test="vo.allergySymptoms != null and vo.allergySymptoms !=''">
+				allergySymptoms =#{vo.allergySymptoms,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.drugHistory != null and vo.drugHistory !=''">
+				drugHistory =#{vo.drugHistory,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.dateBirth != null and vo.dateBirth !=''">
+				dateBirth =#{vo.dateBirth,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.weight != null and vo.weight !=''">
+				weight = #{vo.weight,jdbcType=DOUBLE},
+			</if>
+
+			<if test="vo.mobilePhone != null and vo.mobilePhone != ''">
+				mobilePhone = #{vo.mobilePhone,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.email != null and vo.email != ''">
+				email = #{vo.email,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.loginNo != null and vo.loginNo != ''">
+				loginNo=#{vo.loginNo,jdbcType=VARCHAR},
+			</if>
+			<if test="easemobFlag != null and easemobFlag != ''">
+				easemobFlag=#{easemobFlag,jdbcType=VARCHAR},
+			</if>
+
+			<if test="vo.region != null and vo.region != ''">
+				region=#{vo.region,jdbcType=VARCHAR},
+			</if>
+			<if test="vo.contactMobile != null and vo.contactMobile != ''">
+				contactMobile=#{vo.contactMobile,jdbcType=VARCHAR},
+			</if>
+
+		</set>
+		where personId = #{vo.personId,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAppUserLoginPwd" parameterType="map">
+		update DWI_MD_PERSON
+		<set>
+			<if test="vo.loginPwd != null and vo.loginPwd != ''">
+				loginPwd=#{vo.loginPwd,jdbcType=VARCHAR},
+			</if>
+
+			<if test="vo.updateTime != null and vo.updateTime !=''">
+				updateTime = #{vo.updateTime,jdbcType=TIMESTAMP},
+			</if>
+
+			<if test="easemobFlag != null and easemobFlag != ''">
+				easemobFlag=#{easemobFlag,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where personId = #{vo.personId,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAppUserValidateByMap" parameterType="map">
+		update DWI_MD_PERSON
+		<set>
+			<if test="mobilePhone != null and vmobilePhone != ''">
+				mobilePhone = #{mobilePhone,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null and email != ''">
+				email = #{email,jdbcType=VARCHAR},
+			</if>
+
+			<if test="updateTime != null and updateTime !=''">
+				updateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where personId = #{personId,jdbcType=VARCHAR}
+	</update>
+
+</mapper>

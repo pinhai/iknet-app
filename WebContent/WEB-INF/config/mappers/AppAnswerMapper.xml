@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppAnswerMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appAnswer">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="questionId" property="questionId" jdbcType="VARCHAR" />
+		<result column="answerContent" property="answerContent"
+			jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="answerFlag" property="answerFlag" jdbcType="VARCHAR" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,
+		questionId,(select questionContent from DWI_YL_QUESTION
+		question where 1=1 and question.id=answer.questionId limit 1) as
+		questionContent,answerContent,createTime,answerFlag,personId,(
+		case
+		when answerFlag='1' then (select person.personname from DWI_MD_PERSON
+		person where 1=1 and answer.personId=person.personid limit 1)
+		when
+		answerFlag='2' then (select doctor.doctorName from DWI_YL_DOCTOR
+		doctor where 1=1 and answer.personId=doctor.id limit 1)
+		end
+		) as
+		userName
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		and answer.questionId=#{vo.questionId,jdbcType=VARCHAR}
+	</sql>
+
+
+	<sql id="MyPage_Where">
+		<if test="(vo.personId!= null) and (vo.personId!= '')">
+			and answer.personId=#{vo.personId,jdbcType=VARCHAR}
+		</if>
+		<if test="(vo.answerFlag!= null) and (vo.answerFlag!= '')">
+			and answer.answerFlag=#{vo.answerFlag,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<select id="queryAppAnswerListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_ANSWER answer where 1=1
+		<include refid="Page_Where" />
+		<choose>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryMyAppAnswerListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_ANSWER answer where 1=1
+		<include refid="MyPage_Where" />
+		<choose>
+			<otherwise>
+				order by id desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<insert id="addAppAnswer" parameterType="appAnswer">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_ANSWER
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null"> id, </if>
+			<if test="questionId != null">
+				questionId,
+			</if>
+			<if test="answerContent != null">
+				answerContent,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="answerFlag != null">
+				answerFlag,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null"> #{id,jdbcType=VARCHAR}, </if>
+			<if test="questionId != null">
+				#{questionId,jdbcType=VARCHAR},
+			</if>
+			<if test="answerContent != null">
+				#{answerContent,jdbcType=VARCHAR},
+			</if>
+
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="answerFlag != null">
+				#{answerFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

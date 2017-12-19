@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppValidateTmpMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appValidateTmp">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="mobilePhone" property="mobilePhone" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="sendDate" property="sendDate" jdbcType="VARCHAR" />
+		<result column="validateCode" property="validateCode" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="sendWay" property="sendWay" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,mobilePhone,type,sendDate,validateCode,remark,createTime,sendWay
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Filter_Where">
+		<if test="(vo.mobilePhone!= null) and (vo.mobilePhone!= '')">
+			and
+			validateTmp.mobilePhone=#{vo.mobilePhone,jdbcType=VARCHAR}
+		</if>
+		<if test="(vo.type!= null) and (vo.type!= '')">
+			and
+			validateTmp.type=#{vo.type,jdbcType=VARCHAR}
+		</if>
+		<if test="(vo.sendDate!= null) and (vo.sendDate!= '')">
+			and
+			validateTmp.sendDate=#{vo.sendDate,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<select id="queryAppValidateTmpTotalByMap" resultType="java.lang.Integer"
+		parameterType="map">
+		select count(1) as s from DWI_YL_VALIDATE_TMP validateTmp where 1=1
+		<include refid="Filter_Where" />
+	</select>
+
+	<select id="queryLastValidateCodeByMap" resultType="java.lang.String"
+		parameterType="map">
+		select validateCode from
+		DWI_YL_VALIDATE_TMP validateTmp where 1=1
+		<include refid="Filter_Where" />
+		order by id desc
+		limit 1
+	</select>
+
+	<select id="queryCountByAppValidateTmp" resultType="java.lang.Integer"
+		parameterType="appValidateTmp">
+		select count(validateTmp.id) as s from
+		DWI_YL_VALIDATE_TMP
+		validateTmp where
+		1=1 and
+		validateTmp.type=#{type,jdbcType=VARCHAR} and
+		validateTmp.sendWay=#{sendWay,jdbcType=VARCHAR}
+		and
+		validateTmp.mobilePhone=#{mobilePhone,jdbcType=VARCHAR} and
+		validateTmp.validateCode=#{validateCode,jdbcType=VARCHAR} and
+		DATE_ADD(validateTmp.createtime,INTERVAL 10 MINUTE) &gt;now()
+	</select>
+
+	<insert id="addAppValidateTmp" parameterType="appValidateTmp">
+		insert into DWI_YL_VALIDATE_TMP
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null"> id, </if>
+			<if test="mobilePhone != null">
+				mobilePhone,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="sendDate != null">
+				sendDate,
+			</if>
+			<if test="validateCode != null">
+				validateCode,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="sendWay != null">
+				sendWay,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null"> #{id,jdbcType=VARCHAR}, </if>
+			<if test="mobilePhone != null">
+				#{mobilePhone,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="sendDate != null">
+				#{sendDate,jdbcType=VARCHAR},
+			</if>
+			<if test="validateCode != null">
+				#{validateCode,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="sendWay != null">
+				#{sendWay,jdbcType=TIMESTAMP},
+			</if>
+
+		</trim>
+	</insert>
+
+	<update id="updateAppValidateTmpForValidateFlag" parameterType="java.lang.String">
+		update DWI_YL_VALIDATE_TMP set validateFlag='Y' where
+		mobilePhone=#{deviceNo}
+	</update>
+
+</mapper>

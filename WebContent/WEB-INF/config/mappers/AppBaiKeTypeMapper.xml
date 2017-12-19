@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppBaiKeTypeMapper">
+	<cache />
+
+	<resultMap id="BaseResultMap" type="appBaiKeType">
+		<id column="id" property="id" jdbcType="NUMERIC" />
+		<result column="typeName" property="typeName" jdbcType="VARCHAR" />
+		<result column="typeName_En" property="typeName_En" jdbcType="VARCHAR" />
+		<result column="typeDesc" property="typeDesc" jdbcType="VARCHAR" />
+		<result column="typeDesc_En" property="typeDesc_En" jdbcType="VARCHAR" />
+		<result column="sortIndex" property="sortIndex" jdbcType="NUMERIC" />
+		<result column="isShow" property="isShow" jdbcType="VARCHAR" />
+		<result column="baiKeType" property="baiKeType" jdbcType="VARCHAR" />
+		<result column="baiKeTypeImgUrl" property="baiKeTypeImgUrl"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,typeName,typeName_En,typeDesc,typeDesc_En,sortIndex,isShow,baiKeType,baiKeTypeImgUrl
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+
+	<select id="queryAppBaiKeTypeForList" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_BAIKETYPE baikeType where 1=1
+		<include refid="Page_Where" />
+		order by sortIndex asc
+	</select>
+</mapper>

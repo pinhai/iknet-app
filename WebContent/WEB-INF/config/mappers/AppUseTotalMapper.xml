@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppUseTotalMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appUseTotal">
+		<id column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="testTotal" property="testTotal" jdbcType="INTEGER" />
+		<result column="testNormalTotal" property="testNormalTotal"
+			jdbcType="INTEGER" />
+		<result column="testAbnormalTotal" property="testAbnormalTotal"
+			jdbcType="INTEGER" />
+		<result column="testThreeHeightTotal" property="testThreeHeightTotal"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		personId,testTotal,testNormalTotal,testAbnormalTotal
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+
+	<!-- <select id="queryAppUseTotalByPersonId" parameterType="String" resultMap="BaseResultMap"> 
+		select <include refid="Base_Column_List" /> from DWI_YL_USETOTAL useTotal 
+		where 1=1 and useTotal.personId =#{personId,jdbcType=VARCHAR} limit 1 </select> -->
+
+	<select id="queryAppUseTotalByPersonId" parameterType="String"
+		resultMap="BaseResultMap">
+		select
+		(select count(personId) from DWI_YL_MEDICAL_RECORD as
+		test where
+		test.personId=medicalRecord.personId ) as testTotal,
+		(select
+		count(personId) from DWI_YL_MEDICAL_RECORD as testAbNormal where
+		testAbNormal.personId=medicalRecord.personId and checkResult='0') as
+		testAbNormalTotal
+		,
+		(select count(personId) from DWI_YL_MEDICAL_RECORD
+		testNormal where
+		testNormal.personId=medicalRecord.personId and
+		checkResult='1') as
+		testNormalTotal
+		from DWI_YL_MEDICAL_RECORD
+		medicalRecord where 1=1 and
+		medicalRecord.personId=#{personId,jdbcType=VARCHAR} order by
+		medicalRecord.personId limit 1
+	</select>
+
+	<insert id="addAppUseTotal" parameterType="appUseTotal">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+		insert into DWI_YL_USETOTAL
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="testTotal != null">
+				testTotal,
+			</if>
+			<if test="testNormalTotal != null">
+				testNormalTotal,
+			</if>
+			<if test="testAbnormalTotal != null">
+				testAbnormalTotal,
+			</if>
+			<if test="testThreeHeightTotal != null">
+				testThreeHeightTotal,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="testTotal != null">
+				#{testTotal,jdbcType=INTEGER},
+			</if>
+			<if test="testNormalTotal != null">
+				#{testNormalTotal,jdbcType=INTEGER},
+			</if>
+			<if test="testAbnormalTotal != null">
+				#{testAbnormalTotal,jdbcType=INTEGER},
+			</if>
+			<if test="testThreeHeightTotal != null">
+				#{testThreeHeightTotal,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAppUseTotalForTestNormalTotal" parameterType="map">
+		update DWI_YL_USETOTAL
+		<set>
+			testTotal=testTotal+#{testTotal,jdbcType=INTEGER},
+			testNormalTotal=testNormalTotal+#{testNormalTotal,jdbcType=INTEGER},
+		</set>
+		where personId = #{personId,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAppUseTotalForTestAbnormalTotal"
+		parameterType="map">
+		update DWI_YL_USETOTAL
+		<set>
+			testTotal=testTotal+ #{testTotal,jdbcType=INTEGER},
+			testAbnormalTotal=testAbnormalTotal+
+			#{testAbnormalTotal,jdbcType=INTEGER},
+		</set>
+		where personId = #{personId,jdbcType=VARCHAR}
+	</update>
+
+	<!-- open="begin" close=";end;" -->
+
+
+	<update id="batchUpdateAppUseTotal" parameterType="appUseTotal">
+		update DWI_YL_USETOTAL
+		<set>
+			testTotal=testTotal+
+			#{testTotal},testNormalTotal=testNormalTotal+#{testNormalTotal},testAbnormalTotal=testAbnormalTotal+#{testAbnormalTotal},
+		</set>
+		where personId = #{personId,jdbcType=VARCHAR}
+	</update>
+
+	<!-- <update id="batchUpdateAppUseTotal" parameterType="java.util.List"> 
+		<foreach collection="list" item="vo" index="index" open="" close=";" separator=";"> 
+		update DWI_YL_USETOTAL <set> testTotal=testTotal+ #{vo.testTotal},testNormalTotal=testNormalTotal+#{vo.testNormalTotal},testAbnormalTotal=testAbnormalTotal+#{vo.testAbnormalTotal}, 
+		</set> where personId = #{vo.personId,jdbcType=VARCHAR} </foreach> </update> -->
+
+</mapper>

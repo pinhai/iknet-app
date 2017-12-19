@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppFamilyMembersMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appFamilyMembers">
+		<id column="membersId" property="membersId" jdbcType="VARCHAR" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="membersName" property="membersName" jdbcType="VARCHAR" />
+		<result column="userName" property="userName" jdbcType="VARCHAR" />
+		<result column="membersMobile" property="membersMobile"
+			jdbcType="VARCHAR" />
+		<result column="membersUserId" property="membersUserId"
+			jdbcType="VARCHAR" />
+		<result column="membersRelation" property="membersRelation"
+			jdbcType="DOUBLE" />
+		<result column="validFlag" property="validFlag" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+
+		<result column="imageUrl" property="imageUrl" jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		membersId,personId,membersName,userName,membersMobile,membersUserId,membersRelation,validFlag,createTime,updateTime,imageUrl
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+
+	<select id="queryAppFamilyMembersByMembersId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_MD_FAMILY_MEMBERS familyMembers where 1=1 and
+		familyMembers.membersId=#{membersId,jdbcType=VARCHAR}
+		order by
+		updateTime desc limit 1
+	</select>
+
+	<select id="queryAppFamilyMembersForList" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_MD_FAMILY_MEMBERS familyMembers where 1=1 and
+		familyMembers.personId=#{personId,jdbcType=VARCHAR}
+		order by membersId desc
+	</select>
+
+	<select id="queryAppFamilyMemberCount" resultType="java.lang.Integer"
+		parameterType="appFamilyMembers">
+		select count(1) as s from
+		DWI_MD_FAMILY_MEMBERS familyMembers where 1=1
+		<if test="(membersUserId!= null) and (membersUserId!= '')">
+			and familyMembers.membersUserId=#{membersUserId}
+		</if>
+		<if test="(personId!= null) and (personId!= '')">
+			and familyMembers.personId=#{personId}
+		</if>
+		<if test="(membersName!= null) and (membersName!= '')">
+			and familyMembers.membersName=#{membersName}
+		</if>
+
+	</select>
+	<insert id="addAppFamilyMembers" parameterType="appFamilyMembers">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_MD_FAMILY_MEMBERS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="membersId != null">
+				membersId,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="membersName != null">
+				membersName,
+			</if>
+			<if test="membersUserId != null">
+				membersUserId,
+			</if>
+			<if test="userName != null">
+				userName,
+			</if>
+			<if test="membersMobile != null">
+				membersMobile,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+			<if test="membersRelation != null">
+				MEMBERSRELATION,
+			</if>
+			<if test="validFlag != null">
+				validFlag,
+			</if>
+			<if test="imageUrl != null">
+				imageUrl,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="membersId != null">
+				#{membersId,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="membersName != null">
+				#{membersName,jdbcType=VARCHAR},
+			</if>
+			<if test="membersUserId != null">
+				#{membersUserId,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="membersMobile != null">
+				#{membersMobile,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="membersRelation != null">
+				#{membersRelation,jdbcType=VARCHAR},
+			</if>
+			<if test="validFlag != null">
+				#{validFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="imageUrl != null">
+				#{imageUrl,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAppFamilyMembers" parameterType="appFamilyMembers">
+		update DWI_MD_FAMILY_MEMBERS
+		<set>
+			<if test="membersName != null and membersName != ''">
+				membersName = #{membersName,jdbcType=VARCHAR},
+			</if>
+			<if test="membersRelation != null and membersRelation !=''">
+				membersRelation = #{membersRelation,jdbcType=VARCHAR},
+			</if>
+			<if test="membersMobile != null and membersMobile !=''">
+				membersMobile = #{membersMobile,jdbcType=VARCHAR},
+			</if>
+
+			<if test="updateTime != null and updateTime !=''">
+				updateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where membersId = #{membersId,jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteAppFamilyMembersByMembersId">
+		delete from DWI_MD_FAMILY_MEMBERS where
+		membersId=#{membersId,jdbcType=VARCHAR}
+	</delete>
+
+</mapper>

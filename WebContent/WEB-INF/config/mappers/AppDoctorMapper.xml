@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppDoctorMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appDoctor">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="doctorName" property="doctorName" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="beGoodAt" property="beGoodAt" jdbcType="VARCHAR" />
+		<result column="introduction" property="introduction" jdbcType="VARCHAR" />
+		<result column="isShow" property="isShow" jdbcType="VARCHAR" />
+		<result column="niceTotal" property="niceTotal" jdbcType="NUMERIC" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,doctorName,sex,title,beGoodAt,introduction,isShow,niceTotal,(select
+		departmentName from DWI_YL_DEPARTMENT department where 1=1 and
+		doctor.departmentId=department.Id limit 1) departmentName,
+		(select
+		hospitalName from DWI_YL_HOSPITAL hospital where 1=1 and
+		doctor.hospitalId=hospital.id limit 1) hospitalName
+	</sql>
+
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		and doctor.id=doctorBaiKeType.DOCTORID
+		and
+		doctor.isShow=#{vo.isShow,jdbcType=VARCHAR}
+		and
+		doctorBaiKeType.typeId=#{vo.typeId,jdbcType=INTEGER}
+	</sql>
+
+	<select id="queryAppDoctorByMap" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_DOCTOR doctor where 1=1 and
+		doctor.id=#{id,jdbcType=VARCHAR} and
+		doctor.isShow=#{isShow,jdbcType=VARCHAR} order by
+		niceTotal asc limit 1
+	</select>
+
+	<select id="queryAppDoctorListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_DOCTOR doctor,DWI_YL_DOCTOR_BAIKETYPE doctorBaiKeType
+		where 1=1
+		<include refid="Page_Where" />
+		<choose>
+			<otherwise>
+				order by niceTotal desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<update id="updateAppDoctorNiceTotal">
+		update DWI_YL_DOCTOR
+		<set>
+			niceTotal=niceTotal+1,
+		</set>
+		where id = #{id,jdbcType=VARCHAR}
+	</update>
+</mapper>

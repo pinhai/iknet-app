@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppDoctorNewsMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appDoctorNews">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="doctorId" property="doctorId" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="img" property="img" jdbcType="VARCHAR" />
+		<result column="sortIndex" property="sortIndex" jdbcType="INTEGER" />
+		<result column="newsContent" property="newsContent" jdbcType="VARCHAR" />
+		<result column="niceTotal" property="niceTotal" jdbcType="INTEGER" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,doctorId,title,img,sortIndex,newsContent,niceTotal,createTime
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+
+	<select id="queryAppDoctorNewsById" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_DOCTORNEWS doctorNews where 1=1 and
+		doctorNews.id=#{id,jdbcType=INTEGER}
+		order by id desc limit 1
+	</select>
+
+	<select id="queryAppDoctorNewsForList" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_DOCTORNEWS doctorNews where 1=1
+		<include refid="Page_Where" />
+		order by id desc
+	</select>
+
+	<update id="updateAppDoctorNews" parameterType="appDoctorNews">
+		update DWI_YL_DOCTORNEWS
+		<set>
+			<if test="title != null and title != ''">
+				title=#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="img != null and img !=''">
+				img=#{img,jdbcType=VARCHAR},
+			</if>
+			<if test="sortIndex != null and sortIndex !=''">
+				sortIndex=#{sortIndex,jdbcType=INTEGER},
+			</if>
+			<if test="newsContent != null and newsContent != ''">
+				newsContent=#{newsContent,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+</mapper>

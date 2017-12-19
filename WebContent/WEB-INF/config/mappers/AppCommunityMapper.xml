@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppCommunityMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appCommunity">
+		<id column="communityId" property="communityId" jdbcType="VARCHAR" />
+		<result column="communityCode" property="communityCode"
+			jdbcType="VARCHAR" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="personName" property="personName" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="age" property="age" jdbcType="INTEGER" />
+		<result column="loginNo" property="loginNo" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="height" property="height" jdbcType="DOUBLE" />
+		<result column="weight" property="weight" jdbcType="DOUBLE" />
+		<result column="idCard" property="idCard" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap_appLevel" type="appLevel">
+		<id column="levelId" property="levelId" jdbcType="VARCHAR" />
+		<result column="levelName" property="levelName" jdbcType="VARCHAR" />
+		<result column="sysCode" property="sysCode" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		communityId,communityCode,personId,personName,sex,age,loginNo,createTime,address,height,weight,idCard,(select
+		sysCommunity.sysCommunityName from DWI_SYS_COMMUNITY sysCommunity
+		where 1=1 and sysCommunity.Syscommunitycode=community.communitycode
+		limit 1) communityCodeName
+	</sql>
+
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+		<if test="(vo.communityCode!= null) and (vo.communityCode!= '')">
+			and
+			community.communityCode=#{vo.communityCode,jdbcType=VARCHAR}
+		</if>
+		<if test="(vo.personId!= null) and (vo.communityCode!= '')">
+			and
+			community.personId=#{vo.personId,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<insert id="addAppCommunity" parameterType="appCommunity">
+		<!-- <insert id="addAppUser" parameterType="appUser" useGeneratedKeys="true" 
+			keyProperty="personId"> -->
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_COMMUNITY
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="communityId != null">
+				communityId,
+			</if>
+			<if test="communityCode != null">
+				communityCode,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="personName != null">
+				personName,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="age != null">
+				age,
+			</if>
+			<if test="loginNo != null">
+				loginNo,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="address != null">
+				address,
+			</if>
+			<if test="height != null">
+				height,
+			</if>
+			<if test="weight != null">
+				weight,
+			</if>
+			<if test="idCard != null">
+				idCard,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="communityId != null">
+				#{communityId,jdbcType=VARCHAR},
+			</if>
+			<if test="communityCode != null">
+				#{communityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null">
+				#{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null">
+				#{age,jdbcType=INTEGER},
+			</if>
+			<if test="loginNo != null">
+				#{loginNo,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="address != null">
+				#{address,jdbcType=VARCHAR},
+			</if>
+			<if test="height != null">
+				#{height,jdbcType=DOUBLE},
+			</if>
+			<if test="weight != null">
+				#{weight,jdbcType=DOUBLE},
+			</if>
+			<if test="idCard != null">
+				#{idCard,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<delete id="deleteAppCommunityByCommunityId">
+		delete from DWI_YL_COMMUNITY where
+		communityId=#{communityId,jdbcType=VARCHAR}
+	</delete>
+
+	<select id="queryAppCommunityListForPage" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_COMMUNITY community where 1=1
+		<include refid="Page_Where" />
+		<choose>
+			<otherwise>
+				order by communityId desc
+			</otherwise>
+		</choose>
+		limit #{page.startLimit}, #{page.pageSize}
+	</select>
+
+	<select id="queryAppCommunityCount" resultType="java.lang.Integer"
+		parameterType="appCommunity">
+		select count(1) as s from
+		DWI_YL_COMMUNITY community where 1=1
+		<if test="(personId!= null) and (personId!= '')">
+			and community.personId=#{personId}
+		</if>
+		<if test="(communityCode!= null) and (communityCode!= '')">
+			and community.communityCode=#{communityCode}
+		</if>
+	</select>
+
+	<update id="updateAppCommunity" parameterType="appCommunity">
+		update DWI_YL_COMMUNITY
+		<set>
+			<if test="communityCode != null and communityCode !=''">
+				communityCode=#{communityCode,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null and personName !=''">
+				personName = #{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null and sex != ''">
+				sex = #{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="address != null and address !=''">
+				address = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="age != null and age !=''">
+				age = #{age,jdbcType=INTEGER},
+			</if>
+			<if test="height != null and height !=''">
+				height = #{height,jdbcType=DOUBLE},
+			</if>
+			<if test="weight != null and weight != ''">
+				weight = #{weight,jdbcType=DOUBLE},
+			</if>
+			<if test="idCard != null and idCard != ''">
+				idCard = #{idCard,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where communityId = #{communityId,jdbcType=VARCHAR}
+	</update>
+
+
+	<select id="queryAppLevelListForCommunity" resultMap="BaseResultMap_appLevel">
+		select levelId,levelName,sysCode from DWI_YL_LEVEL level
+		where 1=1
+		and
+		trim(level.levelPid)='0'
+		and trim(level.levelUseFlag)='Y'
+		<choose>
+			<otherwise>
+				order by level.levelId asc
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

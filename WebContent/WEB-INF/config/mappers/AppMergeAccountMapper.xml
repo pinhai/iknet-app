@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppMergeAccountMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appMergeAccount">
+		<id column="mergeAccountId" property="mergeAccountId" jdbcType="VARCHAR" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="accountPersonId" property="accountPersonId"
+			jdbcType="VARCHAR" />
+		<result column="loginNo" property="loginNo" jdbcType="VARCHAR" />
+		<result column="mergeAccountFlag" property="mergeAccountFlag"
+			jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		mergeAccount.mergeAccountId,mergeAccount.personId,mergeAccount.accountPersonId,mergeAccount.loginNo,(select
+		person.personName from DWI_MD_PERSON person where 1=1 and
+		person.personId=mergeAccount.accountPersonId limit 1) personName
+	</sql>
+
+
+	<insert id="addAppMergeAccount" parameterType="appMergeAccount">
+		<!-- <insert id="addAppUser" parameterType="appUser" useGeneratedKeys="true" 
+			keyProperty="personId"> -->
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+
+		insert into DWI_YL_MERGEACCOUNT
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="mergeAccountId != null">
+				mergeAccountId,
+			</if>
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="accountPersonId != null">
+				accountPersonId,
+			</if>
+			<if test="loginNo != null">
+				loginNo,
+			</if>
+			<if test="mergeAccountFlag != null">
+				mergeAccountFlag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="mergeAccountId != null">
+				#{mergeAccountId,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="accountPersonId != null">
+				#{accountPersonId,jdbcType=VARCHAR},
+			</if>
+			<if test="loginNo != null">
+				#{loginNo,jdbcType=VARCHAR},
+			</if>
+			<if test="mergeAccountFlag != null">
+				#{mergeAccountFlag,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<delete id="deleteAppMergeAccount" parameterType="appMergeAccount">
+		delete from
+		DWI_YL_MERGEACCOUNT where
+		mergeAccountId=#{mergeAccountId,jdbcType=VARCHAR}
+	</delete>
+
+	<select id="queryAppMergeAccount" resultMap="BaseResultMap"
+		parameterType="appMergeAccount">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_MERGEACCOUNT mergeAccount where 1=1 and
+		mergeAccount.personId=#{personId} and
+		mergeAccount.mergeAccountFlag=#{mergeAccountFlag} order by
+		mergeAccount.loginNo desc
+	</select>
+
+	<select id="queryAppMergeAccountCount" resultType="java.lang.Integer"
+		parameterType="appMergeAccount">
+		select count(1) as s from
+		DWI_YL_MERGEACCOUNT mergeAccount where 1=1
+		<if test="(personId!= null) and (personId!= '')">
+			and mergeAccount.personId=#{personId}
+		</if>
+		<if test="(accountPersonId!= null) and (accountPersonId!= '')">
+			and mergeAccount.accountPersonId=#{accountPersonId}
+		</if>
+	</select>
+
+</mapper>

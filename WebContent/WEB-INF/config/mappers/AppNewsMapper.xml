@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iknet.server.appserver.mpper.AppNewsMapper">
+	<cache />
+	<resultMap id="BaseResultMap" type="appNews">
+		<id column="newsId" property="newsId" jdbcType="INTEGER" />
+		<result column="personId" property="personId" jdbcType="VARCHAR" />
+		<result column="newsTitle" property="newsTitle" jdbcType="VARCHAR" />
+		<result column="newContent" property="newContent" jdbcType="VARCHAR" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		newsId,personId,newsTitle,newContent,createTime,updateTime
+	</sql>
+	<!-- 分页 过滤 条件 -->
+	<sql id="Page_Where">
+
+	</sql>
+
+	<select id="queryAppNewsByNewsId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_NEWS news where 1=1
+		and
+		news.newsId=#{newsId,jdbcType=INTEGER}
+		order by newsId
+		desc limit 1
+	</select>
+
+
+	<select id="queryAppNewsForList" resultMap="BaseResultMap"
+		parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from DWI_YL_NEWS news where 1=1
+		<include refid="Page_Where" />
+		order by newsId desc
+	</select>
+
+
+	<insert id="addAppNews" parameterType="appNews">
+		<!-- 调用 序列 -->
+		<!-- select SEQ_DWI_SYS_USER.NEXTVAL as userId from dual -->
+		insert into DWI_YL_NEWS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				personId,
+			</if>
+			<if test="newsTitle != null">
+				newsTitle,
+			</if>
+			<if test="newContent != null">
+				newContent,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+			<if test="updateTime != null">
+				updateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="personId != null">
+				#{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="newsTitle != null">
+				#{newsTitle,jdbcType=VARCHAR},
+			</if>
+			<if test="newContent != null">
+				#{newContent,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateAppNews" parameterType="appNews">
+		update DWI_YL_NEWS
+		<set>
+			<if test="newsTitle != null and newsTitle !=''">
+				newsTitle=#{newsTitle,jdbcType=VARCHAR},
+			</if>
+			<if test="newContent != null and newContent != ''">
+				newContent=#{newContent,jdbcType=VARCHAR},
+			</if>
+
+			<if test="updateTime != null and updateTime != ''">
+				updateTime=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where newsId = #{newsId,jdbcType=INTEGER}
+	</update>
+
+</mapper>

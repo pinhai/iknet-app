@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 配置 MyBatis的Cache -->
+		<setting name="cacheEnabled" value="false" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="appAnswer" type="com.iknet.server.appserver.pojo.AppAnswer" />
+		<typeAlias alias="appBaiKeType"
+			type="com.iknet.server.appserver.pojo.AppBaiKeType" />
+		<typeAlias alias="appDoctor" type="com.iknet.server.appserver.pojo.AppDoctor" />
+		<typeAlias alias="appDoctorNews"
+			type="com.iknet.server.appserver.pojo.AppDoctorNews" />
+		<typeAlias alias="appFamilyMembers"
+			type="com.iknet.server.appserver.pojo.AppFamilyMembers" />
+		<typeAlias alias="appFeedBack"
+			type="com.iknet.server.appserver.pojo.AppFeedBack" />
+		<typeAlias alias="appKnowledge"
+			type="com.iknet.server.appserver.pojo.AppKnowledge" />
+		<typeAlias alias="appMedicalRecord"
+			type="com.iknet.server.appserver.pojo.AppMedicalRecord" />
+		<typeAlias alias="appNews" type="com.iknet.server.appserver.pojo.AppNews" />
+		<typeAlias alias="appQuestion"
+			type="com.iknet.server.appserver.pojo.AppQuestion" />
+		<typeAlias alias="appUser" type="com.iknet.server.appserver.pojo.AppUser" />
+		<typeAlias alias="appUseTotal"
+			type="com.iknet.server.appserver.pojo.AppUseTotal" />
+		<typeAlias alias="appValidateTmp"
+			type="com.iknet.server.appserver.pojo.AppValidateTmp" />
+
+		<typeAlias alias="appIknetEasemobUser"
+			type="com.iknet.server.appserver.pojo.AppIknetEasemobUser" />
+
+		<typeAlias alias="appUserThreeInfo"
+			type="com.iknet.server.appserver.pojo.AppUserThreeInfo" />
+
+		<typeAlias alias="appCommunity"
+			type="com.iknet.server.appserver.pojo.AppCommunity" />
+
+		<typeAlias alias="appReviceData"
+			type="com.iknet.server.appserver.pojo.AppReviceData" />
+
+		<typeAlias alias="appThreeHeightRecord"
+			type="com.iknet.server.appserver.pojo.AppThreeHeightRecord" />
+
+
+		<typeAlias alias="appDeviceSimAuto"
+			type="com.iknet.server.appserver.pojo.AppDeviceSimAuto" />
+
+
+		<typeAlias alias="appMergeAccount"
+			type="com.iknet.server.appserver.pojo.AppMergeAccount" />
+
+		<typeAlias alias="appLevel" type="com.iknet.server.appserver.pojo.AppLevel" />
+
+	</typeAliases>
+
+</configuration>
